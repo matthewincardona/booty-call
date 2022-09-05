@@ -145,10 +145,10 @@
         { video: true, audio: true },
         function (stream) {
           var call = peer.call(remoteId, stream);
-          call.on("stream", function (stream) {
+          call.on("stream", function (remoteStream) {
             copyShareLinkBtn.style.display = "none";
             videoContainer.style.display = "block";
-            remoteVideo.srcObject = stream;
+            remoteVideo.srcObject = remoteStream;
             remoteVideo.play();
           });
         },
