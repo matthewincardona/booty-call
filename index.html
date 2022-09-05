@@ -1,9 +1,6 @@
 <!-- TO DO 
 =============
-* merge joinbyquery and startcall into one function
-* create a check earlier on for whether the query exists (maybe a boolean)
 * add messaging
-* clean this shit up
 * add drawing tools?
 -->
 
@@ -43,14 +40,8 @@
       <button id="startCallBtn">Start Call!</button> -->
 
       <div class="video-container" id="videoContainer">
-        <video src="" id="remoteVideo" width="100%"></video>
+        <video src="" id="remoteVideo" width="100%" autoplay></video>
       </div>
-      <video
-        src=""
-        id="testVideo"
-        width="400px"
-        style="border: solid 3px black"
-      ></video>
     </div>
   </body>
 
@@ -58,27 +49,8 @@
     var peer = new Peer(null, {
       debug: 2,
     });
-
-    var constraints = {
-      audio: true,
-      video: true,
-    };
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function (stream) {
-        document.getElementById("testVideo").srcObject = stream;
-      })
-      .catch(function (err) {
-        /* handle the error */
-      });
-
     var remoteId = "";
     var conn = null;
-    // var getUserMedia = navigator.mediaDevices.getUserMedia;
-    // var getUserMedia =
-    //   navigator.getUserMedia ||
-    //   navigator.webkitGetUserMedia ||
-    //   navigator.mozGetUserMedia;
     var remoteVideo = document.getElementById("remoteVideo");
     var videoContainer = document.getElementById("videoContainer");
     videoContainer.style.display = "none";
@@ -174,7 +146,7 @@
     // Remote client
     const startVideoCall = async () => {
       navigator.mediaDevices
-        .getUserMedia({ video: false, audio: true })
+        .getUserMedia({ video: true, audio: true })
         .then(function (stream) {
           var call = peer.call(remoteId, stream);
           call.on("stream", function (remoteStream) {
@@ -193,7 +165,7 @@
     peer.on("call", function (call) {
       // Answer the call, providing our mediaStream
       navigator.mediaDevices
-        .getUserMedia({ video: false, audio: true })
+        .getUserMedia({ video: true, audio: true })
         .then(function (stream) {
           copyShareLinkBtn.style.display = "none";
           videoContainer.style.display = "block";
