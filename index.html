@@ -54,7 +54,7 @@
     });
     var remoteId = "";
     var conn = null;
-    var getUserMedia = navigator.mediaDevices.getUserMedia;
+    // var getUserMedia = navigator.mediaDevices.getUserMedia;
     // var getUserMedia =
     //   navigator.getUserMedia ||
     //   navigator.webkitGetUserMedia ||
@@ -139,11 +139,23 @@
       });
     });
 
+    const getLocalStream = async () => {
+      try {
+        var stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+      } catch (error) {
+        console.log("ERROR" + err);
+      }
+      return stream;
+    };
+
     // Remote client
-    const startVideoCall = () => {
-      getUserMedia(
-        { video: true, audio: true },
-        function (stream) {
+    const startVideoCall = async () => {
+      navigator.mediaDevices
+        .getUserMedia({ video: false, audio: true })
+        .then(function (stream) {
           var call = peer.call(remoteId, stream);
           call.on("stream", function (remoteStream) {
             copyShareLinkBtn.style.display = "none";
@@ -151,29 +163,62 @@
             remoteVideo.srcObject = remoteStream;
             remoteVideo.play();
           });
-        },
-        function (err) {
-          console.log("Failed to get local stream", err);
-        }
-      );
+        })
+        .catch(function (err) {
+          console.log("ERROR: " + err);
+        });
     };
 
-    // Local client
-    peer.on(
-      "call",
-      function (call) {
-        // Answer the call, providing our mediaStream
-        getUserMedia({ video: true, audio: true }, function (stream) {
+    //  Local client
+    peer.on("call", function (call) {
+      // Answer the call, providing our mediaStream
+      navigator.mediaDevices
+        .getUserMedia({ video: false, audio: true })
+        .then(function (stream) {
           copyShareLinkBtn.style.display = "none";
           videoContainer.style.display = "block";
           call.answer(stream);
           remoteVideo.srcObject = stream;
           remoteVideo.play();
+        })
+        .catch(function (err) {
+          console.log("ERROR: " + err);
         });
-      },
-      function (err) {
-        console.log("Failed to get local stream", err);
-      }
-    );
+    });
+
+    // const startVideoCall = () => {
+    //   getUserMedia(
+    //     { video: true, audio: true },
+    //     function (stream) {
+    //       var call = peer.call(remoteId, stream);
+    //       call.on("stream", function (remoteStream) {
+    //         copyShareLinkBtn.style.display = "none";
+    //         videoContainer.style.display = "block";
+    //         remoteVideo.srcObject = remoteStream;
+    //         remoteVideo.play();
+    //       });
+    //     },
+    //     function (err) {
+    //       console.log("Failed to get local stream", err);
+    //     }
+    //   );
+    // };
+
+    // peer.on(
+    //   "call",
+    //   function (call) {
+    //     // Answer the call, providing our mediaStream
+    //     getUserMedia({ video: true, audio: true }, function (stream) {
+    //       copyShareLinkBtn.style.display = "none";
+    //       videoContainer.style.display = "block";
+    //       call.answer(stream);
+    //       remoteVideo.srcObject = stream;
+    //       remoteVideo.play();
+    //     });
+    //   },
+    //   function (err) {
+    //     console.log("Failed to get local stream", err);
+    //   }
+    // );
   </script>
 </html>
