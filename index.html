@@ -1,5 +1,6 @@
 <!-- TO DO 
 =============
+* host sees their own video stream, not the other person's
 * add messaging
 * add drawing tools?
 -->
@@ -131,6 +132,7 @@
       });
     });
 
+    // Unused function
     const getLocalStream = async () => {
       try {
         var stream = await navigator.mediaDevices.getUserMedia({
@@ -153,7 +155,6 @@
             copyShareLinkBtn.style.display = "none";
             videoContainer.style.display = "block";
             remoteVideo.srcObject = remoteStream;
-            remoteVideo.play();
           });
         })
         .catch(function (err) {
@@ -169,48 +170,14 @@
         .then(function (stream) {
           copyShareLinkBtn.style.display = "none";
           videoContainer.style.display = "block";
-          call.answer(stream);
-          remoteVideo.srcObject = stream;
-          remoteVideo.play();
+          call.answer(stream); // Answer the call with an A/V stream.
+          call.on("stream", function (remoteStream) {
+            remoteVideo.srcObject = remoteStream;
+          });
         })
         .catch(function (err) {
           console.log("ERROR: " + err);
         });
     });
-
-    // const startVideoCall = () => {
-    //   getUserMedia(
-    //     { video: true, audio: true },
-    //     function (stream) {
-    //       var call = peer.call(remoteId, stream);
-    //       call.on("stream", function (remoteStream) {
-    //         copyShareLinkBtn.style.display = "none";
-    //         videoContainer.style.display = "block";
-    //         remoteVideo.srcObject = remoteStream;
-    //         remoteVideo.play();
-    //       });
-    //     },
-    //     function (err) {
-    //       console.log("Failed to get local stream", err);
-    //     }
-    //   );
-    // };
-
-    // peer.on(
-    //   "call",
-    //   function (call) {
-    //     // Answer the call, providing our mediaStream
-    //     getUserMedia({ video: true, audio: true }, function (stream) {
-    //       copyShareLinkBtn.style.display = "none";
-    //       videoContainer.style.display = "block";
-    //       call.answer(stream);
-    //       remoteVideo.srcObject = stream;
-    //       remoteVideo.play();
-    //     });
-    //   },
-    //   function (err) {
-    //     console.log("Failed to get local stream", err);
-    //   }
-    // );
   </script>
 </html>
