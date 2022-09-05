@@ -1,0 +1,170 @@
+<!-- TO DO 
+=============
+* merge joinbyquery and startcall into one function
+* create a check earlier on for whether the query exists (maybe a boolean)
+* add messaging
+* clean this shit up
+* add drawing tools?
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Comfortaa"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
+  </head>
+
+  <body>
+    <div class="main-container">
+      <h4>
+        Connection ID: <br /><span id="connectionId">being retrieved...</span>
+      </h4>
+
+      <button id="copyShareLinkBtn">
+        <p id="copyShareLinkBtnText">Copy Share Link<br /><br /></p>
+        <div class="heart-shape"></div>
+      </button>
+      <br />
+      <br />
+
+      <!-- <input
+        type="text"
+        name="remoteIdInput"
+        id="remoteIdInput"
+        placeholder="Please Enter Remote ID"
+      />
+      <button id="startCallBtn">Start Call!</button> -->
+
+      <video src="" id="remoteVideo" width="100%"></video>
+    </div>
+  </body>
+
+  <script>
+    var peer = new Peer(null, {
+      debug: 2,
+    });
+    var remoteId = "";
+    var conn = null;
+    var getUserMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia;
+    var remoteVideo = document.getElementById("remoteVideo");
+    var shareLink = document.getElementById("shareLink");
+    var copyShareLinkBtn = document.getElementById("copyShareLinkBtn");
+    copyShareLinkBtn.disabled = true;
+    var copyShareLinkBtnText = document.getElementById("copyShareLinkBtnText");
+    var url = new URL(document.location);
+    var queryId;
+    var hasQueryId = false;
+    var startCallBtn = document.getElementById("startCallBtn");
+    var remoteIdInput = document.getElementById("remoteIdInput");
+
+    // Parse url for a potential ID
+    let params = new URL(document.location).searchParams;
+    queryId = params.get("id");
+    if (queryId) {
+      hasQueryId = true;
+      console.log("Query (remote) ID is: " + queryId);
+      // startCallBtn.style.display = "none";
+      // remoteIdInput.style.display = "none";
+    } else {
+      hasQueryId = false;
+    }
+
+    // Initialize peer
+    peer.on("open", function (localId) {
+      console.log("Local ID is: " + localId);
+      document.getElementById("connectionId").innerHTML = localId;
+      // create share link if no id is found in the url
+      hasQueryId ? startByQuery() : createShareableLink(localId); // ternary operator
+      return localId;
+    });
+
+    const createShareableLink = (localId) => {
+      url.searchParams.append("id", localId);
+      copyShareLinkBtn.disabled = false;
+    };
+
+    const startByQuery = () => {
+      remoteId = queryId;
+      openConnection();
+    };
+
+    // Start call when button is pressed
+    const startCall = async () => {
+      console.log("Remote ID is: " + remoteIdInput.value);
+      remoteId = remoteIdInput.value;
+      openConnection();
+    };
+
+    // startCallBtn.addEventListener("click", startCall);
+
+    const copyToClipboard = (data) => {
+      console.log(data);
+      navigator.clipboard.writeText(data);
+    };
+
+    copyShareLinkBtn.addEventListener("click", function () {
+      copyToClipboard(url);
+      copyShareLinkBtnText.innerHTML = "Copy Share Link <br /> (Link copied!)";
+    }); // callback function
+
+    // Open a new data connection
+    const openConnection = () => {
+      conn = peer.connect(remoteId);
+      conn.on("open", function () {
+        console.log("Connection successful!");
+        conn.send("Hey bro"); // Send message
+        startVideoCall();
+      });
+    };
+
+    // Receive messages
+    peer.on("connection", function (conn) {
+      conn.on("data", function (data) {
+        console.log(data);
+      });
+    });
+
+    const startVideoCall = () => {
+      getUserMedia(
+        { video: true, audio: true },
+        function (stream) {
+          var call = peer.call(remoteId, stream);
+          call.on("stream", function (remoteStream) {
+            copyShareLinkBtn.style.display = "none";
+            remoteVideo.srcObject = remoteStream;
+            remoteVideo.play();
+          });
+        },
+        function (err) {
+          console.log("Failed to get local stream", err);
+        }
+      );
+    };
+
+    peer.on(
+      "call",
+      function (call) {
+        // Answer the call, providing our mediaStream
+        getUserMedia({ video: true, audio: true }, function (stream) {
+          copyShareLinkBtn.style.display = "none";
+          call.answer(stream);
+          remoteVideo.srcObject = stream;
+          remoteVideo.play();
+        });
+      },
+      function (err) {
+        console.log("Failed to get local stream", err);
+      }
+    );
+  </script>
+</html>
