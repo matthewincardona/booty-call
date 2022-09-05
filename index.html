@@ -138,15 +138,16 @@
       });
     });
 
+    // Remote client
     const startVideoCall = () => {
       getUserMedia(
         { video: true, audio: true },
         function (stream) {
           var call = peer.call(remoteId, stream);
-          call.on("stream", function (remoteStream) {
+          call.on("stream", function (stream) {
             copyShareLinkBtn.style.display = "none";
             videoContainer.style.display = "block";
-            remoteVideo.srcObject = remoteStream;
+            remoteVideo.srcObject = stream;
             remoteVideo.play();
           });
         },
@@ -156,6 +157,7 @@
       );
     };
 
+    // Local client
     peer.on(
       "call",
       function (call) {
