@@ -54,10 +54,11 @@
     });
     var remoteId = "";
     var conn = null;
-    var getUserMedia =
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia;
+    var getUserMedia = navigator.mediaDevices.getUserMedia;
+    // var getUserMedia =
+    //   navigator.getUserMedia ||
+    //   navigator.webkitGetUserMedia ||
+    //   navigator.mozGetUserMedia;
     var remoteVideo = document.getElementById("remoteVideo");
     var videoContainer = document.getElementById("videoContainer");
     videoContainer.style.display = "none";

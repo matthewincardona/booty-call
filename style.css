@@ -55,20 +55,20 @@ button {
 
 @keyframes beat {
   0% {
-    transform: scale(1);
+    transform: scale(0.8);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(0.88);
   }
   100% {
-    transform: scale(1);
+    transform: scale(0.8);
   }
 }
 
 #copyShareLinkBtn {
   width: 350px;
   height: 350px;
-  animation: beat 2s ease-in-out 0.2s infinite backwards;
+  animation: beat 2s ease-in-out 0.3s infinite backwards;
 }
 
 #copyShareLinkBtn p {
