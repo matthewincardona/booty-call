@@ -45,6 +45,12 @@
       <div class="video-container" id="videoContainer">
         <video src="" id="remoteVideo" width="100%"></video>
       </div>
+      <video
+        src=""
+        id="textVideo"
+        width="100%"
+        style="border: solid 3px black"
+      ></video>
     </div>
   </body>
 
@@ -52,6 +58,20 @@
     var peer = new Peer(null, {
       debug: 2,
     });
+
+    var constraints = {
+      audio: true,
+      video: true,
+    };
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function (stream) {
+        document.getElementById("testVideo").srcObject = stream;
+      })
+      .catch(function (err) {
+        /* handle the error */
+      });
+
     var remoteId = "";
     var conn = null;
     // var getUserMedia = navigator.mediaDevices.getUserMedia;
