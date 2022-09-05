@@ -42,7 +42,9 @@
       />
       <button id="startCallBtn">Start Call!</button> -->
 
-      <video src="" id="remoteVideo" width="100%"></video>
+      <div class="video-container" id="videoContainer">
+        <video src="" id="remoteVideo" width="100%"></video>
+      </div>
     </div>
   </body>
 
@@ -57,6 +59,8 @@
       navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia;
     var remoteVideo = document.getElementById("remoteVideo");
+    var videoContainer = document.getElementById("videoContainer");
+    videoContainer.style.display = "none";
     var shareLink = document.getElementById("shareLink");
     var copyShareLinkBtn = document.getElementById("copyShareLinkBtn");
     copyShareLinkBtn.disabled = true;
@@ -141,6 +145,7 @@
           var call = peer.call(remoteId, stream);
           call.on("stream", function (remoteStream) {
             copyShareLinkBtn.style.display = "none";
+            videoContainer.style.display = "block";
             remoteVideo.srcObject = remoteStream;
             remoteVideo.play();
           });
@@ -157,6 +162,7 @@
         // Answer the call, providing our mediaStream
         getUserMedia({ video: true, audio: true }, function (stream) {
           copyShareLinkBtn.style.display = "none";
+          videoContainer.style.display = "block";
           call.answer(stream);
           remoteVideo.srcObject = stream;
           remoteVideo.play();
