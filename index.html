@@ -1,8 +1,8 @@
 <!-- TO DO 
 =============
-* host sees their own video stream, not the other person's
 * add messaging
 * add drawing tools?
+* make getLocalStream() more concise
 -->
 
 <html lang="en">
@@ -41,8 +41,9 @@
       <button id="startCallBtn">Start Call!</button> -->
 
       <div class="video-container" id="videoContainer">
-        <video src="" id="remoteVideo" width="100%" autoplay></video>
+        <video src="" id="remoteVideo" width="800px" autoplay></video>
       </div>
+      <video src="" id="localVideo" width="400px" autoplay></video>
     </div>
   </body>
 
@@ -53,6 +54,7 @@
     var remoteId = "";
     var conn = null;
     var remoteVideo = document.getElementById("remoteVideo");
+    var localVideo = document.getElementById("localVideo");
     var videoContainer = document.getElementById("videoContainer");
     videoContainer.style.display = "none";
     var shareLink = document.getElementById("shareLink");
@@ -71,8 +73,6 @@
     if (queryId) {
       hasQueryId = true;
       console.log("Query (remote) ID is: " + queryId);
-      // startCallBtn.style.display = "none";
-      // remoteIdInput.style.display = "none";
     } else {
       hasQueryId = false;
     }
@@ -80,6 +80,11 @@
     // Initialize peer
     peer.on("open", function (localId) {
       console.log("Local ID is: " + localId);
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then(function (stream) {
+          localVideo.srcObject = stream;
+        });
       document.getElementById("connectionId").innerHTML = localId;
       // create share link if no id is found in the url
       hasQueryId ? startByQuery() : createShareableLink(localId); // ternary operator
@@ -154,6 +159,7 @@
           call.on("stream", function (remoteStream) {
             copyShareLinkBtn.style.display = "none";
             videoContainer.style.display = "block";
+            localVideo.classList.add("video-modal");
             remoteVideo.srcObject = remoteStream;
           });
         })
@@ -170,6 +176,7 @@
         .then(function (stream) {
           copyShareLinkBtn.style.display = "none";
           videoContainer.style.display = "block";
+          localVideo.classList.add("video-modal");
           call.answer(stream); // Answer the call with an A/V stream.
           call.on("stream", function (remoteStream) {
             remoteVideo.srcObject = remoteStream;
