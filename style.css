@@ -29,7 +29,7 @@ body {
   height: 100%;
 }
 
-.video-container #remoteVideo {
+#remoteVideo {
   /* Make video to at least 100% wide and tall */
   min-width: 100%;
   min-height: 100%;
@@ -53,17 +53,18 @@ body {
   width: 400px;
 }
 
+#localVideo {
+  border-radius: 10px;
+  display: block;
+  overflow: hidden;
+  transform: scale(-1, 1); /* flip video horizontally */
+}
+
 /* resize and reposition local video */
 .video-modal {
   position: absolute !important;
   top: 65% !important;
   right: 5% !important;
-}
-
-#localVideo {
-  border-radius: 10px;
-  display: block;
-  overflow: hidden;
 }
 
 button {
