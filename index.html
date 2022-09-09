@@ -1,11 +1,8 @@
 <!-- TO DO 
 =============
-* option to hide local video modal
+* add screenshare
 * drag and resize video (look at https://interactjs.io/)
-* fix main video getting cropped and not matching modal (look at overflow: hidden property in stylesheet)
 * MAKE IT WORK ON MOBILE
-* local stream should be flipped
-* audio echoes horribly
 * feature to share computer audio / play music
 * sexy in-game dice
 * add messaging
@@ -62,7 +59,13 @@
         <button id="hideVideo">
           <img src="./media//toggle-switch-round.svg" alt="" />
         </button>
-        <video src="" id="localVideo" width="100%" autoplay></video>
+        <video
+          src=""
+          id="localVideo"
+          width="100%"
+          autoplay
+          muted="muted"
+        ></video>
       </div>
     </div>
   </body>
