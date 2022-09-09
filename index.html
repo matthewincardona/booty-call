@@ -1,6 +1,5 @@
 <!-- TO DO 
 =============
-* add screenshare
 * drag and resize video (look at https://interactjs.io/)
 * MAKE IT WORK ON MOBILE
 * feature to share computer audio / play music
@@ -9,6 +8,7 @@
 * add drawing tools?
 -->
 
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -42,23 +42,16 @@
       </button>
       <br />
       <br />
-
-      <!-- <input
-        type="text"
-        name="remoteIdInput"
-        id="remoteIdInput"
-        placeholder="Please Enter Remote ID"
-      />
-      <button id="startCallBtn">Start Call!</button> -->
-
       <div class="video-container" id="videoContainer">
         <video src="" id="remoteVideo" width="800px" autoplay></video>
       </div>
       <div class="local-video-container" id="localVideoContainer">
-        <i class="fa-solid fa-crab"></i>
-        <button id="hideVideo">
-          <img src="./media//toggle-switch-round.svg" alt="" />
-        </button>
+        <div class="local-video-controls">
+          <button id="screenShareBtn">Share Screen</button>
+          <button id="hideVideo">
+            <img src="./media//toggle-switch-round.svg" alt="" />
+          </button>
+        </div>
         <video
           src=""
           id="localVideo"
@@ -70,7 +63,9 @@
     </div>
   </body>
 
-  <script>
+  <script type="module">
+    // import { screenShare } from "./screenShare.js";
+
     var peer = new Peer(null, {
       debug: 2,
     });
@@ -125,28 +120,6 @@
       openConnection();
     };
 
-    // Start call when button is pressed
-    const startCall = async () => {
-      console.log("Remote ID is: " + remoteIdInput.value);
-      remoteId = remoteIdInput.value;
-      openConnection();
-    };
-
-    const toggleVideo = () => {
-      if (localVideo.style.display == "block") {
-        localVideo.style.display = "none";
-        console.log("none");
-      } else {
-        localVideo.style.display = "block";
-        console.log("block");
-      }
-    };
-
-    localVideo.style.display = "block";
-    document.getElementById("hideVideo").addEventListener("click", toggleVideo);
-
-    // startCallBtn.addEventListener("click", startCall);
-
     const copyToClipboard = (data) => {
       console.log(data);
       navigator.clipboard.writeText(data);
@@ -156,6 +129,56 @@
       copyToClipboard(url);
       copyShareLinkBtnText.innerHTML = "Copy Share Link <br /> (Link copied!)";
     }); // callback function
+
+    // Start call when button is pressed
+    const startCall = async () => {
+      console.log("Remote ID is: " + remoteIdInput.value);
+      remoteId = remoteIdInput.value;
+      openConnection();
+    };
+
+    // Local video controls
+    // ====================
+
+    const toggleVideo = () => {
+      if (!localVideo.classList.contains("hide-video")) {
+        // if video is currently visible...
+        localVideo.classList.add("hide-video");
+        console.log("none");
+      } else {
+        localVideo.classList.remove("hide-video");
+        console.log("block");
+      }
+    };
+
+    localVideo.style.display = "block";
+    document.getElementById("hideVideo").addEventListener("click", toggleVideo);
+
+    async function screenShare(displayMediaOptions) {
+      try {
+        localVideo.srcObject = await navigator.mediaDevices.getDisplayMedia(
+          displayMediaOptions
+        );
+        localVideo.classList.add("flip-horizontal");
+        console.log("Screen share started!");
+      } catch (err) {
+        console.log("Screenshare error: " + err);
+      }
+    }
+
+    document
+      .getElementById("screenShareBtn")
+      .addEventListener("click", screenShare);
+
+    localVideo.onended = function () {
+      console.log("Screen share ended");
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then(function (stream) {
+          localVideo.srcObject = stream;
+          localVideo.classList.remove("flip-horizontal");
+        });
+    };
 
     // Open a new data connection
     const openConnection = () => {

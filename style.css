@@ -53,18 +53,41 @@ body {
   width: 400px;
 }
 
+#screenShareBtn {
+  padding: 4px 10px 3px 10px;
+  border-radius: 5px;
+  background-color: #cc343b;
+}
+
+.local-video-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#hideVideo img {
+  margin-top: 10px;
+  max-width: 60px;
+  opacity: 70%;
+}
+
 #localVideo {
   border-radius: 10px;
-  display: block;
   overflow: hidden;
   transform: scale(-1, 1); /* flip video horizontally */
 }
 
-/* resize and reposition local video */
-.video-modal {
-  position: absolute !important;
-  top: 65% !important;
-  right: 5% !important;
+.flip-horizontal {
+  transform: scale(1, 1) !important; /* reverse video flip */
+}
+
+.hide-video {
+  display: "none";
+  visibility: hidden;
 }
 
 button {
@@ -72,20 +95,8 @@ button {
   border: none;
   padding: 10px 20px 10px 20px;
   color: white;
-  font-weight: bold;
-}
-
-#hideVideo {
-  position: absolute;
   cursor: pointer;
-  top: 0;
-  right: 0;
-  z-index: 100;
-}
-
-#hideVideo img {
-  width: 60px;
-  opacity: 70%;
+  font-size: 0.5rem;
 }
 
 @keyframes beat {
