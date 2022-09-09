@@ -1,5 +1,13 @@
 <!-- TO DO 
 =============
+* option to hide local video modal
+* drag and resize video (look at https://interactjs.io/)
+* fix main video getting cropped and not matching modal (look at overflow: hidden property in stylesheet)
+* MAKE IT WORK ON MOBILE
+* local stream should be flipped
+* audio echoes horribly
+* feature to share computer audio / play music
+* sexy in-game dice
 * add messaging
 * add drawing tools?
 -->
@@ -13,6 +21,13 @@
     <link
       href="https://fonts.googleapis.com/css?family=Comfortaa"
       rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="./style.css" />
     <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
@@ -42,7 +57,13 @@
       <div class="video-container" id="videoContainer">
         <video src="" id="remoteVideo" width="800px" autoplay></video>
       </div>
-      <video src="" id="localVideo" width="400px" autoplay></video>
+      <div class="local-video-container" id="localVideoContainer">
+        <i class="fa-solid fa-crab"></i>
+        <button id="hideVideo">
+          <img src="./media//toggle-switch-round.svg" alt="" />
+        </button>
+        <video src="" id="localVideo" width="100%" autoplay></video>
+      </div>
     </div>
   </body>
 
@@ -53,6 +74,7 @@
     var remoteId = "";
     var conn = null;
     var remoteVideo = document.getElementById("remoteVideo");
+    var localVideoContainer = document.getElementById("localVideoContainer");
     var localVideo = document.getElementById("localVideo");
     var videoContainer = document.getElementById("videoContainer");
     videoContainer.style.display = "none";
@@ -107,6 +129,19 @@
       openConnection();
     };
 
+    const toggleVideo = () => {
+      if (localVideo.style.display == "block") {
+        localVideo.style.display = "none";
+        console.log("none");
+      } else {
+        localVideo.style.display = "block";
+        console.log("block");
+      }
+    };
+
+    localVideo.style.display = "block";
+    document.getElementById("hideVideo").addEventListener("click", toggleVideo);
+
     // startCallBtn.addEventListener("click", startCall);
 
     const copyToClipboard = (data) => {
@@ -158,7 +193,7 @@
           call.on("stream", function (remoteStream) {
             copyShareLinkBtn.style.display = "none";
             videoContainer.style.display = "block";
-            localVideo.classList.add("video-modal");
+            localVideoContainer.classList.add("video-modal");
             remoteVideo.srcObject = remoteStream;
           });
         })
@@ -175,7 +210,7 @@
         .then(function (stream) {
           copyShareLinkBtn.style.display = "none";
           videoContainer.style.display = "block";
-          localVideo.classList.add("video-modal");
+          localVideoContainer.classList.add("video-modal");
           call.answer(stream); // Answer the call with an A/V stream.
           call.on("stream", function (remoteStream) {
             remoteVideo.srcObject = remoteStream;

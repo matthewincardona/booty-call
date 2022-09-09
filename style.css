@@ -27,7 +27,6 @@ body {
   bottom: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
 }
 
 .video-container #remoteVideo {
@@ -36,8 +35,9 @@ body {
   min-height: 100%;
 
   /* Setting width & height to auto prevents the browser from stretching or squishing the video */
-  width: auto;
-  height: auto;
+  /* width: auto;
+  height: auto; */
+  max-height: 80%;
 
   /* Center the video */
   position: absolute;
@@ -46,11 +46,11 @@ body {
   transform: translate(-50%, -50%);
 }
 
-#localVideo {
+.local-video-container {
   transition: all 0.5s;
   z-index: 100;
-  border-radius: 10px;
   position: relative;
+  width: 400px;
 }
 
 /* resize and reposition local video */
@@ -60,12 +60,31 @@ body {
   right: 5% !important;
 }
 
+#localVideo {
+  border-radius: 10px;
+  display: block;
+  overflow: hidden;
+}
+
 button {
   background: none;
   border: none;
   padding: 10px 20px 10px 20px;
   color: white;
   font-weight: bold;
+}
+
+#hideVideo {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  z-index: 100;
+}
+
+#hideVideo img {
+  width: 60px;
+  opacity: 70%;
 }
 
 @keyframes beat {
