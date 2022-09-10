@@ -245,6 +245,7 @@
             remoteVideoContainer.style.display = "block";
             localVideoContainer.classList.add("video-modal");
             remoteVideo.srcObject = remoteStream;
+            peerCall = call; // export to a global variable
           });
         })
         .catch(function (err) {
