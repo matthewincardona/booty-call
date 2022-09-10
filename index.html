@@ -1,5 +1,6 @@
 <!-- TO DO 
 =============
+* make video modal sit next to full screen video
 * drag and resize video (look at https://interactjs.io/)
 * MAKE IT WORK ON MOBILE
 * feature to share computer audio / play music
@@ -42,7 +43,7 @@
       </button>
       <br />
       <br />
-      <div class="video-container" id="videoContainer">
+      <div class="remote-video-container" id="remoteVideoContainer">
         <video src="" id="remoteVideo" width="800px" autoplay></video>
       </div>
       <div class="local-video-container" id="localVideoContainer">
@@ -71,11 +72,12 @@
     });
     var remoteId = "";
     var conn = null;
+    var peerCall;
     var remoteVideo = document.getElementById("remoteVideo");
     var localVideoContainer = document.getElementById("localVideoContainer");
     var localVideo = document.getElementById("localVideo");
-    var videoContainer = document.getElementById("videoContainer");
-    videoContainer.style.display = "none";
+    var remoteVideoContainer = document.getElementById("remoteVideoContainer");
+    remoteVideoContainer.style.display = "none";
     var shareLink = document.getElementById("shareLink");
     var copyShareLinkBtn = document.getElementById("copyShareLinkBtn");
     copyShareLinkBtn.disabled = true;
@@ -156,10 +158,21 @@
 
     async function screenShare(displayMediaOptions) {
       try {
-        localVideo.srcObject = await navigator.mediaDevices.getDisplayMedia(
+        let screenShareStream = await navigator.mediaDevices.getDisplayMedia(
           displayMediaOptions
         );
+        localVideo.srcObject = screenShareStream;
         localVideo.classList.add("flip-horizontal");
+
+        // replace the other person's stream with your screen share
+        peerCall.peerConnection
+          .getSenders()[1]
+          .replaceTrack(screenShareStream.getVideoTracks()[0]);
+
+        peerCall.peerConnection
+          .getSenders()[0]
+          .replaceTrack(screenShareStream.getAudioTracks()[0]);
+
         console.log("Screen share started!");
       } catch (err) {
         console.log("Screenshare error: " + err);
@@ -177,6 +190,15 @@
         .then(function (stream) {
           localVideo.srcObject = stream;
           localVideo.classList.remove("flip-horizontal");
+
+          // on screen share end, change from sending screen share stream to local stream
+          peerCall.peerConnection
+            .getSenders()[1]
+            .replaceTrack(stream.getVideoTracks()[0]);
+
+          peerCall.peerConnection
+            .getSenders()[0]
+            .replaceTrack(stream.getAudioTracks()[0]);
         });
     };
 
@@ -217,8 +239,9 @@
         .then(function (stream) {
           var call = peer.call(remoteId, stream);
           call.on("stream", function (remoteStream) {
+            document.getElementById("connectionId").style.display = "none";
             copyShareLinkBtn.style.display = "none";
-            videoContainer.style.display = "block";
+            remoteVideoContainer.style.display = "block";
             localVideoContainer.classList.add("video-modal");
             remoteVideo.srcObject = remoteStream;
           });
@@ -234,8 +257,9 @@
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then(function (stream) {
+          document.getElementById("connectionId").style.display = "none";
           copyShareLinkBtn.style.display = "none";
-          videoContainer.style.display = "block";
+          remoteVideoContainer.style.display = "block";
           localVideoContainer.classList.add("video-modal");
           call.answer(stream); // Answer the call with an A/V stream.
           call.on("stream", function (remoteStream) {
@@ -245,6 +269,7 @@
         .catch(function (err) {
           console.log("ERROR: " + err);
         });
+      peerCall = call; // export to a global variable
     });
   </script>
 </html>
