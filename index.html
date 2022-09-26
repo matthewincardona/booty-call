@@ -245,6 +245,8 @@
           call.on("stream", function (remoteStream) {
             document.getElementById("connectionId-container").style.display =
               "none";
+            drawingBoard.width = remoteVideo.offsetWidth;
+            drawingBoard.height = remoteVideo.offsetHeight;
             copyShareLinkBtn.style.display = "none";
             remoteVideoContainer.style.display = "block";
             localVideoContainer.classList.add("video-modal");
@@ -265,6 +267,8 @@
         .then(function (stream) {
           document.getElementById("connectionId-container").style.display =
             "none";
+          drawingBoard.width = remoteVideo.offsetWidth;
+          drawingBoard.height = remoteVideo.offsetHeight;
           copyShareLinkBtn.style.display = "none";
           remoteVideoContainer.style.display = "block";
           localVideoContainer.classList.add("video-modal");
@@ -283,14 +287,127 @@
     // DRAWING TOOLS
     // =================
 
-    // check if remote video is resizing
-    // const videoObserver = new ResizeObserver((entries) => {
-    //   for (let entry of entries) {
-    //     console.log("width", entry.contentRect.width);
-    //     drawingBoard.width = entry.contentRect.width;
-    //   }
-    // });
+    // Brush colour and size
+    const colour = "#3d34a5";
+    const strokeWidth = 25;
 
-    // videoObserver.observe(remoteVideo);
+    // Drawing state
+    let latestPoint;
+    let drawing = false;
+
+    // Set up our drawing context
+    const context = drawingBoard.getContext("2d");
+
+    let brush;
+
+    // Drawing functions
+
+    const continueStroke = (newPoint) => {
+      context.beginPath();
+      context.moveTo(latestPoint[0], latestPoint[1]);
+      context.strokeStyle = colour;
+      context.lineWidth = strokeWidth;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.lineTo(newPoint[0], newPoint[1]);
+      context.stroke();
+
+      latestPoint = newPoint;
+    };
+
+    // Event helpers
+
+    const startStroke = (point) => {
+      drawing = true;
+      latestPoint = point;
+    };
+
+    const getTouchPoint = (evt) => {
+      if (!evt.currentTarget) {
+        return [0, 0];
+      }
+      const rect = evt.currentTarget.getBoundingClientRect();
+      const touch = evt.targetTouches[0];
+      return [touch.clientX - rect.left, touch.clientY - rect.top];
+    };
+
+    const BUTTON = 0b01;
+    const mouseButtonIsDown = (buttons) => (BUTTON & buttons) === BUTTON;
+
+    // Event handlers
+
+    let rect = drawingBoard.getBoundingClientRect();
+
+    const mouseMove = (evt) => {
+      if (!drawing) {
+        return;
+      }
+      continueStroke([evt.clientX - rect.left, evt.clientY - rect.top]);
+    };
+
+    const mouseDown = (evt) => {
+      if (drawing) {
+        return;
+      }
+      evt.preventDefault();
+      drawingBoard.addEventListener("mousemove", mouseMove, false);
+      startStroke([evt.clientX - rect.left, evt.clientY - rect.top]);
+    };
+
+    const mouseEnter = (evt) => {
+      if (!mouseButtonIsDown(evt.buttons) || drawing) {
+        return;
+      }
+      mouseDown(evt);
+    };
+
+    const endStroke = (evt) => {
+      if (!drawing) {
+        return;
+      }
+      drawing = false;
+      evt.currentTarget.removeEventListener("mousemove", mouseMove, false);
+    };
+
+    const touchStart = (evt) => {
+      if (drawing) {
+        return;
+      }
+      evt.preventDefault();
+      startStroke(getTouchPoint(evt));
+    };
+
+    const touchMove = (evt) => {
+      if (!drawing) {
+        return;
+      }
+      continueStroke(getTouchPoint(evt));
+    };
+
+    const touchEnd = (evt) => {
+      drawing = false;
+    };
+
+    // Register event handlers
+    drawingBoard.addEventListener("touchstart", touchStart, false);
+    drawingBoard.addEventListener("touchend", touchEnd, false);
+    drawingBoard.addEventListener("touchcancel", touchEnd, false);
+    drawingBoard.addEventListener("touchmove", touchMove, false);
+
+    drawingBoard.addEventListener("mousedown", mouseDown, false);
+    drawingBoard.addEventListener("mouseup", endStroke, false);
+    drawingBoard.addEventListener("mouseout", endStroke, false);
+    drawingBoard.addEventListener("mouseenter", mouseEnter, false);
+
+    // check if remote video is resizing
+    const videoObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        console.log("width", entry.contentRect.width);
+        drawingBoard.width = entry.contentRect.width;
+        drawingBoard.height = entry.contentRect.height;
+      }
+    });
+
+    videoObserver.observe(remoteVideo);
   </script>
 </html>
