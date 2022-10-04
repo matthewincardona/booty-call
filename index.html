@@ -48,7 +48,7 @@
       <br />
       <br />
       <div class="remote-video-container" id="remoteVideoContainer">
-        <canvas id="drawingBoard"></canvas>
+        <canvas id="drawingBoard" width="100%"></canvas>
         <video src="" id="remoteVideo" autoplay></video>
       </div>
       <div class="local-video-container" id="localVideoContainer">
@@ -211,7 +211,7 @@
       conn = peer.connect(remoteId);
       conn.on("open", function () {
         console.log("Connection successful!");
-        conn.send("Hey bro"); // Send message
+        conn.send("Hey");
         startVideoCall();
       });
     };
@@ -223,18 +223,15 @@
       });
     });
 
-    // Unused function
-    const getLocalStream = async () => {
-      try {
-        var stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-      } catch (error) {
-        console.log("ERROR" + err);
-      }
-      return stream;
-    };
+    // conn.on("open", function () {
+    //   // Receive messages
+    //   conn.on("data", function (data) {
+    //     console.log("Received", data);
+    //   });
+
+    //   // Send messages
+    //   conn.send("Hello!");
+    // });
 
     // Remote client
     const startVideoCall = async () => {
@@ -261,6 +258,7 @@
 
     //  Local client
     peer.on("call", function (call) {
+      openConnection();
       // Answer the call, providing our mediaStream
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -289,7 +287,7 @@
 
     // Brush colour and size
     const colour = "#3d34a5";
-    const strokeWidth = 25;
+    const strokeWidth = 6;
 
     // Drawing state
     let latestPoint;
@@ -322,6 +320,16 @@
       latestPoint = point;
     };
 
+    const copyCanvas = () => {
+      let sourceImageData = drawingBoard.toDataURL("image/png");
+      console.log(sourceImageData);
+      sendCanvas(sourceImageData);
+    };
+
+    const sendCanvas = (data) => {
+      conn.send(data);
+    };
+
     const getTouchPoint = (evt) => {
       if (!evt.currentTarget) {
         return [0, 0];
@@ -335,14 +343,17 @@
     const mouseButtonIsDown = (buttons) => (BUTTON & buttons) === BUTTON;
 
     // Event handlers
-
-    let rect = drawingBoard.getBoundingClientRect();
-
     const mouseMove = (evt) => {
       if (!drawing) {
         return;
       }
-      continueStroke([evt.clientX - rect.left, evt.clientY - rect.top]);
+      copyCanvas();
+      let offsetX =
+        (window.innerWidth -
+          Math.floor(remoteVideo.getBoundingClientRect().width)) /
+        2;
+      console.log(offsetX);
+      continueStroke([evt.clientX - offsetX, evt.clientY]);
     };
 
     const mouseDown = (evt) => {
@@ -351,7 +362,11 @@
       }
       evt.preventDefault();
       drawingBoard.addEventListener("mousemove", mouseMove, false);
-      startStroke([evt.clientX - rect.left, evt.clientY - rect.top]);
+      let offsetX =
+        (window.innerWidth -
+          Math.floor(remoteVideo.getBoundingClientRect().width)) /
+        2;
+      startStroke([evt.clientX - offsetX, evt.clientY]);
     };
 
     const mouseEnter = (evt) => {
