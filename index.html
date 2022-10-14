@@ -52,6 +52,11 @@
         <video src="" id="remoteVideo" autoplay></video>
       </div>
       <div class="local-video-container" id="localVideoContainer">
+        <canvas
+          id="localVideoDrawingBoard"
+          width="450px"
+          height="337px"
+        ></canvas>
         <div class="local-video-controls">
           <button id="screenShareBtn">Share Screen</button>
           <button id="hideVideo">
@@ -81,7 +86,6 @@
     var localVideo = document.getElementById("localVideo");
     var remoteVideoContainer = document.getElementById("remoteVideoContainer");
     remoteVideoContainer.style.display = "none";
-    var drawingBoard = document.getElementById("drawingBoard");
     var shareLink = document.getElementById("shareLink");
     var copyShareLinkBtn = document.getElementById("copyShareLinkBtn");
     copyShareLinkBtn.disabled = true;
@@ -91,6 +95,11 @@
     var hasQueryId = false;
     var startCallBtn = document.getElementById("startCallBtn");
     var remoteIdInput = document.getElementById("remoteIdInput");
+
+    var drawingBoard = document.getElementById("drawingBoard");
+    var localVideoDrawingBoard = document.getElementById(
+      "localVideoDrawingBoard"
+    );
 
     // Parse url for a potential ID
     let params = new URL(document.location).searchParams;
@@ -143,6 +152,7 @@
       openConnection();
     };
 
+    // ====================
     // Local video controls
     // ====================
 
@@ -211,27 +221,9 @@
       conn = peer.connect(remoteId);
       conn.on("open", function () {
         console.log("Connection successful!");
-        conn.send("Hey");
         startVideoCall();
       });
     };
-
-    // Receive messages
-    peer.on("connection", function (conn) {
-      conn.on("data", function (data) {
-        console.log(data);
-      });
-    });
-
-    // conn.on("open", function () {
-    //   // Receive messages
-    //   conn.on("data", function (data) {
-    //     console.log("Received", data);
-    //   });
-
-    //   // Send messages
-    //   conn.send("Hello!");
-    // });
 
     // Remote client
     const startVideoCall = async () => {
@@ -281,6 +273,23 @@
       peerCall = call; // export to a global variable
     });
 
+    // Receive messages
+    peer.on("connection", function (conn) {
+      conn.on("data", function (data) {
+        if (data.name == "remoteCanvasData") {
+          let canvasImg = new Image();
+          canvasImg.src = data.sourceImageData;
+          const localVideoDrawingBoardContext =
+            localVideoDrawingBoard.getContext("2d");
+          // wait for image to fully load
+          canvasImg.onload = function () {
+            console.log(canvasImg);
+            localVideoDrawingBoardContext.drawImage(canvasImg, 0, 0);
+          };
+        }
+      });
+    });
+
     // =================
     // DRAWING TOOLS
     // =================
@@ -293,22 +302,22 @@
     let latestPoint;
     let drawing = false;
 
-    // Set up our drawing context
-    const context = drawingBoard.getContext("2d");
+    // Set up our drawing drawingBoardContext
+    const drawingBoardContext = drawingBoard.getContext("2d");
 
     let brush;
 
     // Drawing functions
 
     const continueStroke = (newPoint) => {
-      context.beginPath();
-      context.moveTo(latestPoint[0], latestPoint[1]);
-      context.strokeStyle = colour;
-      context.lineWidth = strokeWidth;
-      context.lineCap = "round";
-      context.lineJoin = "round";
-      context.lineTo(newPoint[0], newPoint[1]);
-      context.stroke();
+      drawingBoardContext.beginPath();
+      drawingBoardContext.moveTo(latestPoint[0], latestPoint[1]);
+      drawingBoardContext.strokeStyle = colour;
+      drawingBoardContext.lineWidth = strokeWidth;
+      drawingBoardContext.lineCap = "round";
+      drawingBoardContext.lineJoin = "round";
+      drawingBoardContext.lineTo(newPoint[0], newPoint[1]);
+      drawingBoardContext.stroke();
 
       latestPoint = newPoint;
     };
@@ -322,8 +331,11 @@
 
     const copyCanvas = () => {
       let sourceImageData = drawingBoard.toDataURL("image/png");
-      console.log(sourceImageData);
-      sendCanvas(sourceImageData);
+      let data = {
+        name: "remoteCanvasData",
+        sourceImageData: sourceImageData,
+      };
+      sendCanvas(data);
     };
 
     const sendCanvas = (data) => {
@@ -352,7 +364,6 @@
         (window.innerWidth -
           Math.floor(remoteVideo.getBoundingClientRect().width)) /
         2;
-      console.log(offsetX);
       continueStroke([evt.clientX - offsetX, evt.clientY]);
     };
 
