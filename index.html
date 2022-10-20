@@ -381,7 +381,7 @@
         (window.innerWidth -
           Math.floor(remoteVideo.getBoundingClientRect().width)) /
         2;
-      continueStroke([evt.clientX - offsetX, evt.clientY]);
+      continueStroke([evt.clientX - offsetX + 5, evt.clientY - 10]);
     };
 
     const mouseDown = (evt) => {
@@ -394,7 +394,7 @@
         (window.innerWidth -
           Math.floor(remoteVideo.getBoundingClientRect().width)) /
         2;
-      startStroke([evt.clientX - offsetX, evt.clientY]);
+      startStroke([evt.clientX - offsetX + 5, evt.clientY - 10]);
     };
 
     const mouseEnter = (evt) => {
