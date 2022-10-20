@@ -96,10 +96,14 @@
     var startCallBtn = document.getElementById("startCallBtn");
     var remoteIdInput = document.getElementById("remoteIdInput");
 
+    // local and remote canvases for drawing
     var drawingBoard = document.getElementById("drawingBoard");
     var localVideoDrawingBoard = document.getElementById(
       "localVideoDrawingBoard"
     );
+    const localVideoDrawingBoardContext =
+      localVideoDrawingBoard.getContext("2d");
+    localVideoDrawingBoardContext;
 
     // Parse url for a potential ID
     let params = new URL(document.location).searchParams;
@@ -279,12 +283,25 @@
         if (data.name == "remoteCanvasData") {
           let canvasImg = new Image();
           canvasImg.src = data.sourceImageData;
-          const localVideoDrawingBoardContext =
-            localVideoDrawingBoard.getContext("2d");
           // wait for image to fully load
           canvasImg.onload = function () {
             console.log(canvasImg);
-            localVideoDrawingBoardContext.drawImage(canvasImg, 0, 0);
+            localVideoDrawingBoardContext.scale(-1, 1);
+            localVideoDrawingBoardContext.setTransform(1, 0, 0, 1, 0, 0);
+            let hRatio = localVideoDrawingBoard.width / canvasImg.width;
+            let vRatio = localVideoDrawingBoard.height / canvasImg.height;
+            let ratio = Math.min(hRatio, vRatio);
+            localVideoDrawingBoardContext.drawImage(
+              canvasImg,
+              0,
+              0,
+              canvasImg.width,
+              canvasImg.height,
+              0,
+              0,
+              canvasImg.width * ratio,
+              canvasImg.height * ratio
+            );
           };
         }
       });

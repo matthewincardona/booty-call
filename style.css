@@ -59,6 +59,7 @@ body {
   z-index: 200;
   border: solid 3px forestgreen;
   border-radius: 10px;
+  transform: scale(-1, 1);
 }
 
 .video-modal {
