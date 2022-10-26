@@ -40,7 +40,6 @@ body {
   z-index: 100;
   width: 99.5%;
   height: 89.5vh;
-  border: solid 3px red;
 }
 
 #localVideoContainer {
@@ -57,7 +56,6 @@ body {
   width: 100%;
   height: 100%;
   z-index: 200;
-  border: solid 3px forestgreen;
   border-radius: 10px;
 }
 
