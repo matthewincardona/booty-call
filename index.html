@@ -174,11 +174,12 @@
     localVideo.style.display = "block";
     document.getElementById("hideVideo").addEventListener("click", toggleVideo);
 
-    async function screenShare(displayMediaOptions) {
+    async function screenShare() {
       try {
-        let screenShareStream = await navigator.mediaDevices.getDisplayMedia(
-          displayMediaOptions
-        );
+        let screenShareStream = await navigator.mediaDevices.getDisplayMedia({
+          audio: true,
+          video: true,
+        });
         localVideo.srcObject = screenShareStream;
         localVideo.classList.add("flip-horizontal");
 
