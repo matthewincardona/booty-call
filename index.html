@@ -75,7 +75,10 @@
   </body>
 
   <script type="module">
+    var jwt =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     var peer = new Peer(null, {
+      token: jwt,
       debug: 2,
     });
     var remoteId = "";
@@ -217,7 +220,7 @@
     // Open a new remote data connection
     const openRemoteConnection = () => {
       conn = peer.connect(remoteId);
-      conn.on("open", function () {
+      conn.on("open", () => {
         console.log("Connection successful!");
         startVideoCall();
       });
@@ -246,17 +249,17 @@
         });
     };
 
-    // Open a new remote data connection
+    // Open a new local data connection
     const openLocalConnection = (peerId) => {
       conn = peer.connect(peerId);
-      conn.on("open", function () {
+      conn.on("open", () => {
         console.log("Connection successful!");
       });
     };
 
     //  Local client
     peer.on("call", function (call) {
-      console.log(call.peer);
+      console.log("Remote ID is: " + call.peer);
       openLocalConnection(call.peer);
       // Answer the call, providing our mediaStream
       navigator.mediaDevices
@@ -359,8 +362,6 @@
     };
 
     const sendCanvas = (data) => {
-      console.log("SENDING");
-      console.log(conn);
       conn.send(data);
     };
 
