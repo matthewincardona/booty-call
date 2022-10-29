@@ -286,7 +286,6 @@
           canvasImg.src = data.sourceImageData;
           // wait for image to fully load
           canvasImg.onload = function () {
-            console.log(canvasImg);
             localVideoDrawingBoardContext.scale(-1, 1);
             localVideoDrawingBoardContext.setTransform(1, 0, 0, 1, 0, 0);
             let hRatio = localVideoDrawingBoard.width / canvasImg.width;
@@ -357,6 +356,7 @@
     };
 
     const sendCanvas = (data) => {
+      console.log("SENDING");
       conn.send(data);
     };
 
