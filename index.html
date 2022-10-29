@@ -136,7 +136,7 @@
 
     const startByQuery = () => {
       remoteId = queryId;
-      openConnection();
+      openRemoteConnection();
     };
 
     const copyToClipboard = (data) => {
@@ -148,13 +148,6 @@
       copyToClipboard(url);
       copyShareLinkBtnText.innerHTML = "Copy Share Link <br /> (Link copied!)";
     }); // callback function
-
-    // Start call when button is pressed
-    const startCall = async () => {
-      console.log("Remote ID is: " + remoteIdInput.value);
-      remoteId = remoteIdInput.value;
-      openConnection();
-    };
 
     // ====================
     // Local video controls
@@ -221,8 +214,8 @@
         });
     };
 
-    // Open a new data connection
-    const openConnection = () => {
+    // Open a new remote data connection
+    const openRemoteConnection = () => {
       conn = peer.connect(remoteId);
       conn.on("open", function () {
         console.log("Connection successful!");
@@ -253,9 +246,18 @@
         });
     };
 
+    // Open a new remote data connection
+    const openLocalConnection = (peerId) => {
+      conn = peer.connect(peerId);
+      conn.on("open", function () {
+        console.log("Connection successful!");
+      });
+    };
+
     //  Local client
     peer.on("call", function (call) {
-      openConnection();
+      console.log(call.peer);
+      openLocalConnection(call.peer);
       // Answer the call, providing our mediaStream
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -275,6 +277,7 @@
         .catch(function (err) {
           console.log("ERROR: " + err);
         });
+
       peerCall = call; // export to a global variable
     });
 
@@ -357,6 +360,7 @@
 
     const sendCanvas = (data) => {
       console.log("SENDING");
+      console.log(conn);
       conn.send(data);
     };
 
