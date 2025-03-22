@@ -1,7 +1,7 @@
 <!-- TO DO 
 =============
-* flip your video feed and incoming video feed
 * make drawing more precise
+* add "clear canvas button" and eraser
 * show screen share
 * add states to screen share toggle
 * update readme
@@ -381,7 +381,11 @@
       (window.innerWidth -
         Math.floor(remoteVideo.getBoundingClientRect().width)) /
       2;
-    continueStroke([evt.clientX - offsetX + 5, evt.clientY - 10]);
+    let offsetY =
+      (window.innerHeight -
+        Math.floor(remoteVideo.getBoundingClientRect().width)) /
+      2;
+    continueStroke([evt.clientX - offsetX, evt.clientY + offsetY + 25]);
   };
 
   const mouseDown = (evt) => {
@@ -394,7 +398,11 @@
       (window.innerWidth -
         Math.floor(remoteVideo.getBoundingClientRect().width)) /
       2;
-    startStroke([evt.clientX - offsetX + 5, evt.clientY - 10]);
+    let offsetY =
+      (window.innerHeight -
+        Math.floor(remoteVideo.getBoundingClientRect().width)) /
+      2;
+    startStroke([evt.clientX - offsetX, evt.clientY + offsetY + 25]);
   };
 
   const mouseEnter = (evt) => {
