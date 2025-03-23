@@ -47,6 +47,9 @@ body {
   z-index: 100;
   position: relative;
   width: 450px;
+  background-color: #ffffff48;
+  border-radius: 10px;
+
 }
 
 #localVideoDrawingBoard {
@@ -68,10 +71,11 @@ body {
 
 .local-video-controls {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   z-index: 300;
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: center;
 }
@@ -79,23 +83,41 @@ body {
 #screenShareBtn {
   padding: 4px 10px 3px 10px;
   border-radius: 5px;
-  background-color: #cc343b;
+  background-color: #4f3739;
+}
+
+#hideVideo {
+  border-radius: 1000px;
+  border: solid 1px #CC343B;
+  color: #CC343B;
+  padding: 4px 10px 3px 10px;
+  background-color: #ffffff48;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 #hideVideo img {
-  margin-top: 10px;
-  max-width: 60px;
-  opacity: 70%;
+  height: 16px;
+  width: 16px;
+}
+
+.hideVideo--hidden {
+  background-color: #CC343B !important;
+  color: #ffffff !important;
 }
 
 #localVideo {
   border-radius: 10px;
   overflow: hidden;
-  transform: scale(-1, 1); /* flip video horizontally */
+  transform: scale(-1, 1);
+  /* flip video horizontally */
 }
 
 .flip-horizontal {
-  transform: scale(1, 1) !important; /* reverse video flip */
+  transform: scale(1, 1) !important;
+  /* reverse video flip */
 }
 
 .hide-video {
@@ -133,9 +155,11 @@ button {
   0% {
     transform: scale(0.82);
   }
+
   50% {
     transform: scale(0.88);
   }
+
   100% {
     transform: scale(0.82);
   }
@@ -155,6 +179,7 @@ button {
   transform: rotate(45deg);
   background: #f47174;
 }
+
 .heart-shape:before,
 .heart-shape:after {
   position: absolute;
@@ -167,10 +192,12 @@ button {
   border-radius: 50%;
   background: #f47174;
 }
+
 .heart-shape:before {
   bottom: 0px;
   left: -80px;
 }
+
 .heart-shape:after {
   top: -80px;
   right: 0px;

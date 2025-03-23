@@ -1,7 +1,6 @@
 <!-- TO DO 
 =============
 * add "clear canvas button" and eraser
-* show screen share
 * add states to screen share toggle
 * update readme
 
@@ -50,7 +49,8 @@
       <div class="local-video-controls">
         <button id="screenShareBtn">Share Screen</button>
         <button id="hideVideo">
-          <img src="./media//toggle-switch-round.svg" alt="" />
+          Toggle Video
+          <img src="./media/Hide video icon.svg">
         </button>
       </div>
       <video src="" id="localVideo" width="100%" autoplay muted="muted"></video>
@@ -141,13 +141,19 @@
   // ====================
 
   const toggleVideo = () => {
+    let toggleVideoButton = document.getElementById("hideVideo");
+    let toggleVideoButtonIcon = toggleVideoButton.querySelector("img");
     if (!localVideo.classList.contains("hide-video")) {
       // if video is currently visible...
       localVideo.classList.add("hide-video");
-      console.log("none");
+      toggleVideoButton.classList.add("hideVideo--hidden");
+      toggleVideoButtonIcon.src = "./media/Show video icon.svg";
+      console.log("Video hidden");
     } else {
       localVideo.classList.remove("hide-video");
-      console.log("block");
+      toggleVideoButton.classList.remove("hideVideo--hidden");
+      toggleVideoButtonIcon.src = "./media/Hide video icon.svg";
+      console.log("Video shown");
     }
   };
 
