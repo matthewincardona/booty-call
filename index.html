@@ -183,33 +183,45 @@
         .replaceTrack(screenShareStream.getAudioTracks()[0]);
 
       console.log("Screen share started!");
+
+      // Handle when screen share ends
+      handleScreenShareEnd(screenShareStream);
+
     } catch (err) {
       console.log("Screenshare error: " + err);
     }
+
+
   }
+
+  function handleScreenShareEnd(screenShareStream) {
+    // check if screen share has ended and add back user's video stream
+    screenShareStream.getVideoTracks()[0].addEventListener("ended", function () {
+      console.log("Screen share ended");
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then(function (stream) {
+          localVideo.srcObject = stream;
+          localVideo.classList.remove("flip-horizontal");
+
+          // on screen share end, change from sending screen share stream to local stream
+          peerCall.peerConnection
+            .getSenders()[1]
+            .replaceTrack(stream.getVideoTracks()[0]);
+
+          peerCall.peerConnection
+            .getSenders()[0]
+            .replaceTrack(stream.getAudioTracks()[0]);
+        });
+    });
+  }
+
 
   document
     .getElementById("screenShareBtn")
     .addEventListener("click", screenShare);
 
-  localVideo.onended = function () {
-    console.log("Screen share ended");
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then(function (stream) {
-        localVideo.srcObject = stream;
-        localVideo.classList.remove("flip-horizontal");
 
-        // on screen share end, change from sending screen share stream to local stream
-        peerCall.peerConnection
-          .getSenders()[1]
-          .replaceTrack(stream.getVideoTracks()[0]);
-
-        peerCall.peerConnection
-          .getSenders()[0]
-          .replaceTrack(stream.getAudioTracks()[0]);
-      });
-  };
 
   // Open a new remote data connection
   const openRemoteConnection = () => {
